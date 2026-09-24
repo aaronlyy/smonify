@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:18
+    container_name: postgres-dev
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+  adminer:
+      image: adminer
+      environment:
+        ADMINER_DEFAULT_SERVER: db
+      restart: always
+      ports:
+        - 8080:8080
+        
+volumes:
+  postgres_data:
