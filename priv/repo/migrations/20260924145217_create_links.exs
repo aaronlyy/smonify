@@ -7,9 +7,11 @@ defmodule Smonify.Repo.Migrations.CreateLinks do
       add :code, :string, null: false
       add :clicks, :integer, null: false, default: 0
       add :account_id, references(:accounts, on_delete: :delete_all), null: false
-
       timestamps()
     end
+
+    create unique_index(:links, [:code])
+    create index(:links, [:account_id])
 
   end
 end
