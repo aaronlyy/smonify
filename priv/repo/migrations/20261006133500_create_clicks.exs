@@ -4,6 +4,7 @@ defmodule Smonify.Repo.Migrations.CreateClicks do
   def change do
     create table(:clicks) do
       add :user_agent, :text
+      add :ip_address, :inet
       add :link_id, references(:links, on_delete: :delete_all), null: false
       timestamps(updated_at: false)
     end

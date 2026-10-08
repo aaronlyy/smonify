@@ -10,6 +10,9 @@ defmodule Smonify.Accounts.User do
     field :email, :string
     field :role, Ecto.Enum, values: [:user, :moderator, :admin], default: :user
     field :password, :string, virtual: true, redact: true
+    field :active, :boolean, default: true
+    field :failed_login_attempts, :integer, default: 0
+    field :locked_until, :utc_datetime_usec
     field :password_hash, :string, redact: true
     field :display_name, :string
 
@@ -33,10 +36,18 @@ defmodule Smonify.Accounts.User do
     |> hash_password()
   end
 
-  def update_changeset(user, params \\ %{}) do
+  # update user information
+  def update_info_changeset(user, params \\ %{}) do
     user
     |> cast(params, [:display_name])
     |> validate_length(:display_name, min: 3, max: 32)
+  end
+
+  # activate or deactivate an user
+  def active_changeset(user, params \\ %{}) do
+    user
+    |> cast(params, [:active])
+    |> validate_required([:active])
   end
 
   defp hash_password(%Ecto.Changeset{valid?: true, changes: %{password: password}} = changeset) do

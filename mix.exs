@@ -51,6 +51,7 @@ defmodule Smonify.MixProject do
       # data
       {:ecto, "~> 3.14"},
       {:ecto_sql, "~> 3.14"},
+      {:ecto_network, "~> 1.6"},
       {:postgrex, "~> 0.22.4"},
       {:supra, "~> 4.0"},
       {:flop, "~> 0.29.0"},
