@@ -5,6 +5,9 @@ defmodule Smonify.Links.Link do
 
   import Ecto.Changeset
 
+  @min_code_length 4
+  @max_code_length 32
+
   schema "links" do
     field :url, :string
     field :code, :string
@@ -21,6 +24,7 @@ defmodule Smonify.Links.Link do
     |> validate_required([:url, :code])
     |> validate_url(:url)
     |> validate_length(:url, max: 2048)
+    |> validate_length(:code, min: @min_code_length, max: @max_code_length)
     |> unique_constraint(:code)
     |> assoc_constraint(:user)
   end
@@ -37,4 +41,9 @@ defmodule Smonify.Links.Link do
       end
     end)
   end
+
+  # # check code against a profanity wordlist
+  # # this wordlist does not exists rn, ill add that later
+  # def validate_no_profanity(changeset, field) do
+  # end
 end

@@ -10,6 +10,7 @@ defmodule Smonify.Accounts do
   @lock_duration_minutes 15
 
   defdelegate can?(user, permission), to: Permissions
+  defdelegate outranks?(actor, target), to: Permissions
 
   def register_user(attrs) do
     %User{}
@@ -17,8 +18,7 @@ defmodule Smonify.Accounts do
     |> Repo.insert()
   end
 
-  def authenticate_user(username, password)
-      when is_binary(username) and is_binary(password) do
+  def authenticate_user(username, password) when is_binary(username) and is_binary(password) do
     with {:ok, user} <- fetch_user(username),
          :ok <- check_active(user),
          :ok <- check_not_locked(user),
@@ -40,20 +40,36 @@ defmodule Smonify.Accounts do
 
   def authenticate_user(_username, _password), do: {:error, :invalid_credentials}
 
-  # TODO
-  def delete_user do
+  def delete_user(%User{id: id}, %User{id: id}), do: {:error, :cannot_delete_self}
+
+  def delete_user(%User{} = actor, %User{} = target) do
+    if can?(actor, :delete_user) and outranks?(actor, target) do
+      Smonify.Repo.delete(target)
+    else
+      {:error, :unauthorized}
+    end
   end
 
-  # TODO
-  def deactivate_user do
+  def deactivate_user(%User{id: id}, %User{id: id}), do: {:error, :cannot_deactivate_self}
+
+  def deactivate_user(%User{} = actor, %User{} = target) do
+    if can?(actor, :deactivate_user) and outranks?(actor, target) do
+      target
+      |> User.active_changeset(%{active: false})
+      |> Repo.update()
+    else
+      {:error, :unauthorized}
+    end
   end
 
-  # TODO
-  def activate_user do
-  end
-
-  # TODO
-  def update_user do
+  def activate_user(%User{} = actor, %User{} = target) do
+    if can?(actor, :activate_user) and outranks?(actor, target) do
+      target
+      |> User.active_changeset(%{active: true})
+      |> Repo.update()
+    else
+      {:error, :unauthorized}
+    end
   end
 
   # fetch user
