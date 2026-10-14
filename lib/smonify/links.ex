@@ -3,10 +3,10 @@ defmodule Smonify.Links do
 
   import Ecto.Query
 
-  alias Smonify.Repo
   alias Smonify.Accounts
   alias Smonify.Accounts.User
   alias Smonify.Links.{Link, Click}
+  alias Smonify.Repo
 
   @random_code_length 8
 
